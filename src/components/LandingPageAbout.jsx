@@ -18,7 +18,7 @@ export default function LandingPageAbout() {
         {" "}
         <h2 className="text-2xl font-bold text-center mb-8">How it works</h2>
         <p className="text-gray-800 mb-4">
-          Local Chord prodivdes the tools you need to thrive in your local music
+          Ensemble prodivdes the tools you need to thrive in your local music
           scene.
         </p>
         <ul className="list-disc list-inside text-gray-700">
