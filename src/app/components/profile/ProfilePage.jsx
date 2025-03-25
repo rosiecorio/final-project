@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './ProfilePage.css';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 // Mock data - replace with actual API calls
 const MOCK_USER = {
@@ -105,8 +106,13 @@ const ProfilePage = () => {
       <div className="profile-content">
         {/* Profile Header */}
         <div className="profile-header">
+          {/* Avatar api integratioon */}
           <div className="profile-pic">
-            <img src={user.profilePic} alt={`${user.name}'s profile`} />
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={user.profilePic} alt={`${user.name}'s profile`} />
+              <AvatarFallback>{user.name.charAt(0)}{user.name.split(' ')[1]?.charAt(0)}</AvatarFallback>
+              
+            </Avatar>
           </div>
           <div className="profile-info">
             <h1>{user.name}</h1>
