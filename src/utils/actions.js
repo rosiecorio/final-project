@@ -12,9 +12,8 @@ export async function handleSubmit(formData) {
     const {userId} = await auth()    
 
     const data = Object.fromEntries(formData)
-    const {content} = data
-    const user_id = await db.query(`SELECT * FROM users WHERE clerk_id = $1`, [userId])
-    const thread_id= f
+    const {content, thread_id} = data
+    const user_id = await db.query(`SELECT id FROM users WHERE clerk_id = $1`, [userId])
     
     await db.query(`INSERT INTO posts (user_id, thread_id, content) VALUES ($1, $2, $3)`, [user_id, thread_id, content])
 }
