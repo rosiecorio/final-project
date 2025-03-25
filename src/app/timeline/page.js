@@ -1,3 +1,4 @@
+import NewPostButton from "@/components/NewPostButton"
 import pg from "pg"
 
 export default async function Page() {
@@ -8,6 +9,7 @@ export default async function Page() {
 
     const allPosts = (await db.query(`SELECT * FROM posts`)).rows
     console.log(allPosts)
+
 
     return (
         <div className="flex flex-col items-center">
@@ -20,7 +22,7 @@ export default async function Page() {
                 ))}
             </section>
             <section>
-                <button>Create New Post</button>
+                <NewPostButton/>
             </section>
         </div>
     )
