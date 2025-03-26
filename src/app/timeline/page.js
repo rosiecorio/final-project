@@ -13,11 +13,11 @@ export default async function Page() {
 
     return (
         <div className="flex flex-col items-center">
-            <section className="flex flex-row gap-5 w-[90vw] pb-5">
+            <section className="flex flex-row text-xs w-[90vw] pb-5">
                 <button>General Discussion</button>
                 <button>Music Collaboration</button>
                 <button>Gear Talk</button>
-                <button>Performance Tips</button>
+                <button>Tips For Performance</button>
                 <button>Music Theory</button>
             </section>
             <section className="flex flex-col h-[70vh] w-[90vw] bg-slate-200 items-start gap-5">
