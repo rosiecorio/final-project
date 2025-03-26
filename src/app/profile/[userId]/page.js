@@ -1,69 +1,121 @@
-'use client';
-
+'use client'
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import pg from "pg";
+import { useAuth } from '@clerk/nextjs';
 
 // Import CSS
-import './profile.css';  // You'll need to create this file with the CSS content
-
-// Mock data - replace with actual API calls
-const MOCK_USER = {
-  id: '1',
-  username: 'guitargenius',
-  name: 'Alex Johnson',
-  bio: 'Guitarist and producer based in London.',
-  profilePic: '/images/profile-placeholder.jpg',
-  genres: ['Indie Rock', 'Alternative', 'Folk'],
-  instruments: ['Guitar', 'Bass', 'Synth'],
-  location: 'London, UK',
-  links: {
-    soundcloud: 'https://soundcloud.com/guitargenius',
-    bandcamp: 'https://guitargenius.bandcamp.com',
-    instagram: 'https://instagram.com/guitargenius'
-  },
-  posts: [
-    {
-      id: '101',
-      title: 'Looking for drummer',
-      content: 'Need a drummer for upcoming gig at The Continental Club on May 15th.',
-      date: '2025-03-20',
-      likes: 5,
-      comments: 3
-    },
-    {
-      id: '102',
-      title: 'New track released',
-      content: 'Just dropped a new single "Midnight Blues" - check it out on my SoundCloud!',
-      date: '2025-03-15',
-      likes: 12,
-      comments: 7
-    }
-  ]
-};
+import './profile.css';
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
   
   // Get userId from the route
   const params = useParams();
-  const userId = params.userId;
+  const pageUserId = params.userId;
   
-  // Determine if this is the user's own profile (for edit controls)
-  const isOwnProfile = userId === '1'; // Replace with actual auth check
-
+  // Get the currently logged-in user's clerk ID
+  const { userId: clerkUserId } = useAuth();
+  
   useEffect(() => {
-    // API call to fetch user data
-    setTimeout(() => {
-      setUser(MOCK_USER);
-      setEditFormData(MOCK_USER);
-      setLoading(false);
-    }, 500);
-  }, [userId]);
+    const fetchUserData = async () => {
+      try {
+        // Create database connection
+        const db = new pg.Pool({
+          connectionString: process.env.NEXT_PUBLIC_DB_CONN
+        });
+        
+        // First, find the database user ID that corresponds to this clerk ID
+        let queryUserId = pageUserId;
+        let databaseUserId;
+        
+        // Get the user from the database - might be the current user or another user we're viewing
+        const userResult = await db.query(
+          'SELECT u.*, i.instrument, i.level, g.name as genre_name FROM users u ' +
+          'LEFT JOIN instrument i ON u.id = i.user_id ' +
+          'LEFT JOIN genres g ON i.genre = g.id ' +
+          'WHERE u.id = $1 OR u.clerk_id = $1',
+          [pageUserId]
+        );
+        
+        // Determine if this is the user's own profile
+        if (userResult.rows.length > 0) {
+          databaseUserId = userResult.rows[0].id;
+          const currentUserClerkId = userResult.rows[0].clerk_id;
+          setIsOwnProfile(currentUserClerkId === clerkUserId);
+        }
+        
+        // Fetch user posts
+        const postsResult = await db.query(
+          'SELECT p.*, COUNT(c.id) as comments FROM posts p ' +
+          'LEFT JOIN comments c ON p.id = c.post_id ' +
+          'WHERE p.user_id = $1 ' +
+          'GROUP BY p.id',
+          [databaseUserId]
+        );
+        
+        if (userResult.rows.length > 0) {
+          const userData = userResult.rows[0];
+          
+          // Collect all instruments and genres from the result
+          const instruments = [];
+          const genres = [];
+          
+          userResult.rows.forEach(row => {
+            if (row.instrument && !instruments.includes(row.instrument)) {
+              instruments.push(row.instrument);
+            }
+            if (row.genre_name && !genres.includes(row.genre_name)) {
+              genres.push(row.genre_name);
+            }
+          });
+          
+          // Format the user data
+          const formattedUser = {
+            id: userData.id,
+            username: userData.username || '',
+            name: userData.username || '',  // Using username as name since there's no name field
+            bio: userData.bio || '',
+            profilePic: '/images/profile-placeholder.jpg',  // Default since there's no profile pic field
+            genres: genres,
+            instruments: instruments,
+            location: userData.post_code || '',
+            links: {
+              soundcloud: '',  // These fields don't exist in your schema
+              bandcamp: '',
+              instagram: ''
+            },
+            posts: postsResult.rows.map(post => ({
+              id: post.id,
+              title: `Post #${post.id}`,  // No title field in your schema
+              content: post.content,
+              date: new Date().toISOString().split('T')[0],  // No date field in your schema
+              likes: 0,  // No likes field in your schema
+              comments: parseInt(post.comments) || 0
+            }))
+          };
+          
+          setUser(formattedUser);
+          setEditFormData(formattedUser);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setLoading(false);
+      }
+    };
+  
+    if (pageUserId) {
+      fetchUserData();
+    }
+  }, [pageUserId, clerkUserId]);
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -99,11 +151,34 @@ export default function ProfilePage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Send API request here
-    setUser(editFormData);
-    setIsEditing(false);
+    
+    try {
+      // Create database connection
+      const db = new pg.Pool({
+        connectionString: process.env.NEXT_PUBLIC_DB_CONN
+      });
+      
+      // Update user basic data
+      await db.query(
+        `UPDATE users 
+         SET bio = $1, post_code = $2
+         WHERE id = $3`,
+        [
+          editFormData.bio,
+          editFormData.location,
+          user.id
+        ]
+      );
+      
+      // Update the user state with the new data
+      setUser(editFormData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
   if (loading) {
@@ -120,7 +195,7 @@ export default function ProfilePage() {
         <div className="nav-links">
           <Link href="/timeline">Timeline</Link>
           <Link href="/services">Services</Link>
-          <Link href="/profile/1">Profile</Link>
+          <Link href="/profile">Profile</Link>
           <button className="logout-btn">Logout</button>
         </div>
       </nav>
