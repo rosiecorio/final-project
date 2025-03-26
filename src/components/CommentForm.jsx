@@ -1,38 +1,36 @@
-"use client";
-import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { revalidatePath } from "next/cache";
+import pg from "pg";
 
 export default function CommentForm({ postId }) {
-  const [comment, setComment] = useState("");
-  const { userId } = useAuth();
+  async function handleSubmit({ formData }) {
+    "use server";
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+    const db = new pg.Pool({
+      connectionString: process.env.DB_CONN,
+    });
 
-    if (!comment.trim()) return;
+    const { userId } = await auth();
+
+    const content = formData.get("comment");
+
+    if (!content.trim()) return;
 
     try {
-      const response = await fetch("/api/comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ postId, userId, content: comment }),
-      });
-
-      if (response.ok) {
-        setComment("");
-      }
+      await db.query(
+        `INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)`,
+        [postId, userId, content]
+      );
+      revalidatePath("/timeline");
     } catch (error) {
-      console.error("Error posting comment:", error);
+      console.error("Error adding comment", error);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
+    <form action={handleSubmit} className="mt-4">
       <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        name="content"
         placeholder="Write a comment..."
         className="w-full p-2 border rounded"
       />
