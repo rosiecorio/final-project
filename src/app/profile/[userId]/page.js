@@ -1,48 +1,45 @@
-
-import { ProfileClient } from './ProfileClient';
-import pg from 'pg';
+import { ProfileClient } from '@/components/ProfileClient';
 import { auth } from '@clerk/nextjs/server';
+import pg from 'pg';
 
 export default async function ProfilePage({ params }) {
-  const resolvedParams = await params;
-  const pageUserId = resolvedParams.userId;
+  const pageUserId = params.userId; // This comes as a string from URL
   const { userId: clerkUserId } = await auth();
   
-  // Create database connection (similar to your working example)
+  // create database connection
   const db = new pg.Pool({
     connectionString: process.env.DB_CONN
   });
   
-  
-  // Get the user from the database
-  const userResult = await db.query(
-    'SELECT u.*, i.instrument FROM users u ' +
-    'LEFT JOIN instrument i ON u.id = i.user_id ' +
-    'WHERE u.clerk_id = $1',
-    [pageUserId]
-  );
-  
-  let userData = null;
-  let userPosts = [];
-  let isOwnProfile = false;
-  
-  if (userResult.rows.length > 0) {
-    const databaseUserId = userResult.rows[0].id;
+  try {
+    // fetch user data by clerk_id 
+    const userResult = await db.query(
+      'SELECT u.*, i.instrument, i.level, g.name as genre_name FROM users u ' +
+      'LEFT JOIN instrument i ON u.id = i.user_id ' +
+      'LEFT JOIN genres g ON i.genre::integer = g.id::integer ' +
+      'WHERE u.clerk_id = $1',
+      [pageUserId]
+    );
     
-    // Fetch user posts
+    if (userResult.rows.length === 0) {
+      return <div>user not found</div>;
+    }
+    
+    const databaseUserId = userResult.rows[0].id; // This is an INT from DB
+    
+    // fetch user posts - ensure we pass the ID as number
     const postsResult = await db.query(
       'SELECT p.*, COUNT(c.id) as comments FROM posts p ' +
       'LEFT JOIN comments c ON p.id = c.post_id ' +
       'WHERE p.user_id = $1 ' +
       'GROUP BY p.id',
-      [databaseUserId]
+      [databaseUserId] // This is already a number from the DB
     );
     
-    // Process user data
-    const rawUserData = userResult.rows[0];
-    isOwnProfile = rawUserData.clerk_id === clerkUserId;
+    // process user data
+    const userData = userResult.rows[0];
     
-    // Collect instruments and genres
+    // collect instruments and genres
     const instruments = [];
     const genres = [];
     
@@ -55,40 +52,38 @@ export default async function ProfilePage({ params }) {
       }
     });
     
-    // Format user data
-    userData = {
-      id: rawUserData.id,
-      clerk_id: rawUserData.clerk_id,
-      username: rawUserData.username || '',
-      name: rawUserData.username || '',
-      bio: rawUserData.bio || '',
+    // format user data
+    const formattedUser = {
+      id: userData.id,
+      clerk_id: userData.clerk_id,
+      username: userData.username || '',
+      name: userData.username || '',
+      bio: userData.bio || '',
       profilePic: '/images/profile-placeholder.jpg',
       genres: genres,
       instruments: instruments,
-      location: rawUserData.post_code || '',
+      location: userData.post_code || '',
       links: {
         soundcloud: '',
         bandcamp: '',
         instagram: ''
-      }
+      },
+      posts: postsResult.rows.map(post => ({
+        id: post.id,
+        title: `Post #${post.id}`,
+        content: post.content,
+        date: new Date().toISOString().split('T')[0],
+        likes: 0,
+        comments: parseInt(post.comments) || 0 // Ensure this is a number
+      }))
     };
     
-    // Format posts
-    userPosts = postsResult.rows.map(post => ({
-      id: post.id,
-      title: `Post #${post.id}`,
-      content: post.content,
-      date: new Date().toISOString().split('T')[0],
-      likes: 0,
-      comments: parseInt(post.comments) || 0
-    }));
+    return <ProfileClient initialUser={formattedUser} initialPosts={formattedUser.posts} />;
+  } catch (error) {
+    console.error('error fetching profile data:', error);
+    return <div>error loading profile</div>;
+  } finally {
+    // Always close the database connection
+    await db.end();
   }
-  
-  // Pass data to client component
-  return <ProfileClient 
-    userData={userData} 
-    userPosts={userPosts} 
-    isOwnProfile={isOwnProfile} 
-    userId={pageUserId}
-  />;
 }

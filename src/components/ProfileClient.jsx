@@ -1,5 +1,4 @@
-
-Copy
+// ProfileClient.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,6 +6,8 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from '@clerk/nextjs';
+
+// import css
 import './profile.css';
 
 const ProfileClient = ({ initialUser, initialPosts }) => {
@@ -16,39 +17,35 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState(initialUser || {});
   
+  // get userId from the route
   const params = useParams();
-  const pageUserId = params.userId; // This is a string
+  const pageUserId = params.userId;
   
+  // get current user's clerk id
   const { userId: clerkUserId } = useAuth();
+  
+  // determine if this is the user's own profile
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   
   useEffect(() => {
+    // fetch user data if not provided initially
     if (!initialUser) {
       fetch(`/api/users/${pageUserId}`)
         .then(res => res.json())
         .then(data => {
           if (data.user) {
-            // ensure all IDs are strings for consistency duh
-            const normalizedUser = {
-              ...data.user,
-              id: data.user.id.toString(),
-              posts: data.user.posts?.map(post => ({
-                ...post,
-                id: post.id.toString()
-              })) || []
-            };
-            
-            setUser(normalizedUser);
-            setEditFormData(normalizedUser);
+            setUser(data.user);
+            setEditFormData(data.user);
             setIsOwnProfile(data.user.clerk_id === clerkUserId);
           }
           setLoading(false);
         })
         .catch(error => {
-          console.error('Error fetching profile:', error);
+          console.error('error fetching profile:', error);
           setLoading(false);
         });
     } else {
+      // set isOwnProfile based on clerk id
       setIsOwnProfile(initialUser.clerk_id === clerkUserId);
     }
   }, [pageUserId, clerkUserId, initialUser]);
