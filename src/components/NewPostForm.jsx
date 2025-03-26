@@ -12,13 +12,17 @@ export default async function NewPostForm() {
             connectionString: process.env.DB_CONN
         })
     
-        const {userId} = await auth()    
+        const {userId} = await auth() 
+
     
         const data = Object.fromEntries(formData)
         const {content, thread_id} = data
-        const user_id = await db.query(`SELECT id FROM users WHERE clerk_id = $1`, [userId])
+
+        const threadNumber = (await db.query(`SELECT id FROM threads WHERE type = $1`, [thread_id])).rows[0].thread_id
+        console.log(threadNumber)
+        const user_id = (await db.query(`SELECT id FROM users WHERE clerk_id = $1`, [userId])).rows[0].id
         
-        await db.query(`INSERT INTO posts (user_id, thread_id, content) VALUES ($1, $2, $3)`, [user_id, thread_id, content])
+        await db.query(`INSERT INTO posts (user_id, thread_id, content) VALUES ($1, $2, $3)`, [user_id, threadNumber, content])
         revalidatePath('/timeline')
     }
 

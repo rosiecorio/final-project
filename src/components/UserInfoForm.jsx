@@ -11,7 +11,8 @@ import { ArrowRight } from "lucide-react"
 import { motion } from "motion/react"
 
 
-export default function UserInfoForm() {
+
+export default function UserInfoForm({submitForm}) {
      const [formStep, setFormStep] = useState(0)
      const form = useForm({
         defaultValues: {
@@ -25,16 +26,13 @@ export default function UserInfoForm() {
                 genre: '',
         }
      })
-
-//      const submitForm = (data) => {
+     
+// function submitForm (data){
 //         console.log(data)
-//      }
-function submitForm (data){
-        console.log(data)
-}
+// }
         return (
                 <div className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                       <Card className="w-[80vw] max-h-[75vh] overflow-hidden">
+                       <Card className="w-[80vw] max-h-[60vh] ">
                         <CardHeader>
                                 <CardTitle>Encore!</CardTitle>
                                 <CardDescription>Please tell us more.</CardDescription>
@@ -43,7 +41,7 @@ function submitForm (data){
                                 <Form {...form}>
                                         <form 
                                         onSubmit={form.handleSubmit(submitForm)}
-                                        className="space-y-10 relative overflow-x-hidden ">
+                                        className="space-y-10 relative overflow-x-hidden max-h-[40vh]">
                                                 <motion.div 
                                                 className={cn("space-y-6 pl-[1rem] pt-[3rem] pr-[1rem]", {
                                                         //  hidden:formStep ==1
@@ -91,7 +89,7 @@ function submitForm (data){
                                                 {/* postcode */}
                                                     <FormField 
                                                     control={form.control} 
-                                                    name="postcode"
+                                                    name="post_code"
                                                     render={({field}) =>(
                                                         <FormItem>
                                                                 <FormLabel>Location</FormLabel>
@@ -104,7 +102,7 @@ function submitForm (data){
                                                 />
                                                 </motion.div>
                                                <motion.div 
-                                               className={cn("space-y-3 absolute -top-4 left-0 right-0 h-auto", {
+                                               className={cn("space-y-3 absolute -top-5 left-0 right-0  pl-[0.5rem] pr-[0.5rem] max-h-[30vh] overflow-y-auto", {
                                                 //hidden:formStep ==0
                                                })}
                                                animate={{
@@ -174,6 +172,35 @@ function submitForm (data){
                                                         </FormItem>
                                                 )}
                                                 />
+                                                {/*gig ready bool dropdown*/}
+                                                <FormField 
+                                                    control={form.control} 
+                                                    name="gig_ready"
+                                                    render={({field}) =>(
+                                                        <FormItem>
+                                                                <FormLabel>Gig ready</FormLabel>
+                                                                <Select 
+                                                                onValueChange={field.onChange}
+                                                                defaultValue={field.value}>
+                                                                        <FormControl>
+                                                                                <SelectTrigger>
+                                                                                        <SelectValue placeholder="Are you Gig ready?" />
+                                                                                </SelectTrigger>
+                                                                        </FormControl>
+                                                                        <SelectContent>
+                                                                                {['Yes', 'No'].map((gig_ready) => {
+                                                                                        return (
+                                                                                                <SelectItem value={gig_ready} key={gig_ready}>
+                                                                                                        {gig_ready}
+                                                                                                </SelectItem>
+                                                                                        )
+                                                                                })}
+                                                                        </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                        </FormItem>
+                                                )}
+                                                />
                                                 {/* availabilty bool dropdown*/}
                                                     <FormField 
                                                     control={form.control} 
@@ -204,7 +231,7 @@ function submitForm (data){
                                                 )}
                                                 />
                                                 {/* genre dropdown*/}
-                                                    <FormField 
+                                                     <FormField 
                                                     control={form.control} 
                                                     name="genre"
                                                     render={({field}) =>(
@@ -215,11 +242,11 @@ function submitForm (data){
                                                                 defaultValue={field.value}>
                                                                         <FormControl>
                                                                                 <SelectTrigger>
-                                                                                        <SelectValue placeholder="Select your music genre" />
+                                                                                        <SelectValue placeholder="Select your genre" />
                                                                                 </SelectTrigger>
                                                                         </FormControl>
                                                                         <SelectContent>
-                                                                                {['Rock', 'Metal', 'Jazz', 'Classical', 'Pop', 'Hip Hop', 'Electronic', 'Country', 'Blues', 'Folk', 'R&B', 'Ska', 'Eclectic', ].map((genre) => {
+                                                                                {['Rock', 'Metal', 'Jazz', 'Classical', 'Pop', 'Hip Hop', 'Electronic', 'Country', 'Blues', 'Folk', 'R&B', 'Ska', 'Eclectic'].map((genre) => {
                                                                                         return (
                                                                                                 <SelectItem value={genre} key={genre}>
                                                                                                         {genre}
@@ -232,6 +259,7 @@ function submitForm (data){
                                                         </FormItem>
                                                 )}
                                                 />
+                                                
                                                </motion.div>
                                                 <div className="relative flex justify-between mt-[1rem]">
                                                       <Button 
@@ -244,11 +272,11 @@ function submitForm (data){
                                                                 form.trigger(['username', 'bio', 'postcode'])
                                                                 const usernameState = form.getFieldState('username')
                                                                 const bioState = form.getFieldState('bio')
-                                                                const postcodeState = form.getFieldState('postcode')
+                                                                const post_codeState = form.getFieldState('post_code')
 
                                                                 if (!usernameState.isDirty || usernameState.invalid) return;
                                                                 if (!bioState.isDirty || bioState.invalid) return;
-                                                                if (!postcodeState.isDirty || postcodeState.invalid) return;
+                                                                if (!post_codeState.isDirty || post_codeState.invalid) return;
                                                                 
                                                                 setFormStep(1);
                                                         }}
@@ -257,13 +285,29 @@ function submitForm (data){
                                                                 <ArrowRight className="w-4 h-4 ml-2" />
                                                         </Button>
                                                         </div>
-                                                        <div className="relative flex justify-between pt-[10vh]">
+                                                        <div className="relative flex justify-between">
                                                           <Button 
                                                         type="submit" 
                                                         className={cn({
                                                         hidden: formStep == 0,
                                                         })}
-                                                        
+                                                        onClick={() => {
+                                                                form.trigger(['instrument', 'years', 'level', 'gig_ready', 'availability', 'genre'])
+                                                                const instrumentState = form.getFieldState('instrument')
+                                                                const yearsState = form.getFieldState('years')
+                                                                const levelState = form.getFieldState('level')
+                                                                const gig_readyState = form.getFieldState('gig_ready')
+                                                                const availabilityState = form.getFieldState('availability')
+                                                                const genreState = form.getFieldState('genre')
+
+                                                                if (!instrumentState.isDirty || instrumentState.invalid) return;
+                                                                if (!yearsState.isDirty || yearsState.invalid) return;
+                                                                if (!levelState.isDirty || levelState.invalid) return;
+                                                                if (!gig_readyState.isDirty || gig_readyState.invalid) return;
+                                                                if (!availabilityState.isDirty || availabilityState.invalid) return;
+                                                                if (!genreState.isDirty || genreState.invalid) return;
+
+                                                        }}
                                                         >
                                                          Submit
                                                         </Button>
