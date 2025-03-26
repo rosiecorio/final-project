@@ -20,7 +20,8 @@ export default async function Page() {
   });
 
   const allPosts = (
-    await db.query(`SELECT * FROM posts JOIN users ON posts.user_id = users.id`)
+    await db.query(`SELECT posts.*,  users.username, users.id AS user_id FROM posts 
+      JOIN users ON posts.user_id = users.id`)
   ).rows;
 
   //   Threads Buttons section
@@ -38,7 +39,7 @@ export default async function Page() {
       {/* Posts section to display all posts */}
       <section className="flex flex-col w-full max-w-4xl gap-4">
         {allPosts.map((item) => (
-          <PostItem key={item.id} item={item} />
+          <PostItem key={item.id} item={item} user_id={item.user_id} />
         ))}
       </section>
 
@@ -54,6 +55,17 @@ export default async function Page() {
 }
 
 async function PostItem({ item }) {
+  const db = new pg.Pool({
+    connectionString: process.env.DB_CONN,
+  });
+
+  const allComments = (
+    await db.query(
+      `SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE post_id = $1`,
+      [item.id]
+    )
+  ).rows;
+
   return (
     <Card className="w-full">
       <CardHeader className="flex items-center space-x-4">
@@ -70,6 +82,29 @@ async function PostItem({ item }) {
       </CardHeader>
       <CardContent>
         <p className="text-sm">{item.content}</p>
+        <div className="row mt-4">
+          {allComments.map((comment) => (
+            <div
+              key={comment.id}
+              className="flex items-center space-x-2 py-2 border-b last:border-b-0"
+            >
+              <Avatar className="h-6 w-6">
+                <AvatarImage
+                  src={`https://avatar.vercel.sh/${comment.username}.jpeg`}
+                />
+                <AvatarFallback>
+                  {comment.username.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium leading-none">
+                  {comment.username}
+                </p>
+                <p className="text-xs text-gray-500">{comment.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="flex gap-2 mt-2">
           <CommentForm postId={item.id} />
         </div>
@@ -77,26 +112,3 @@ async function PostItem({ item }) {
     </Card>
   );
 }
-
-/* //           <div className="text-black flex flex-row p-3 gap-5" key={item.id}>
-//             <div className="flex flex-row gap-5">
-//               <p>profile picture</p>
-//               <p>{item.content}</p>
-//               <DeletePost />
-//             </div>
-//             <div>
-//               <CommentForm postId={item.id} />
-//             </div>
-//           </div>
-//         ))}
-//       </section>
-
-//       <section>
-//         <NewPostButton>
-//           <NewPostForm />
-//         </NewPostButton>
-//       </section>
-
-//     </div>
-//   );
-// } */
