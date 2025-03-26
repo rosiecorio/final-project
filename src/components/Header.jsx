@@ -17,13 +17,6 @@ export default function Header() {
       >
         Ensemble
       </Link>
-
-      <Link
-        href="http://localhost:3000/sign-in"
-        className="text-gray-700 hover:text-blue-600"
-      >
-        Sign In/ Sign Up
-      </Link>
     </nav>
   );
 }
