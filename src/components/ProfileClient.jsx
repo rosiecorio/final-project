@@ -1,14 +1,14 @@
 // ProfileClient.jsx
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from '@clerk/nextjs';
+import { useAuth } from "@clerk/nextjs";
 
 // import css
-import './profile.css';
+import "./profile.css";
 
 const ProfileClient = ({ initialUser, initialPosts }) => {
   const [user, setUser] = useState(initialUser || null);
@@ -16,23 +16,23 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
   const [loading, setLoading] = useState(!initialUser);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState(initialUser || {});
-  
+
   // get userId from the route
   const params = useParams();
   const pageUserId = params.userId;
-  
+
   // get current user's clerk id
   const { userId: clerkUserId } = useAuth();
-  
+
   // determine if this is the user's own profile
   const [isOwnProfile, setIsOwnProfile] = useState(false);
-  
+
   useEffect(() => {
     // fetch user data if not provided initially
     if (!initialUser) {
       fetch(`/api/users/${pageUserId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.user) {
             setUser(data.user);
             setEditFormData(data.user);
@@ -40,8 +40,8 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
           }
           setLoading(false);
         })
-        .catch(error => {
-          console.error('error fetching profile:', error);
+        .catch((error) => {
+          console.error("error fetching profile:", error);
           setLoading(false);
         });
     } else {
@@ -56,16 +56,16 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // handle nested objects (for links)
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
       setEditFormData({
         ...editFormData,
         [parent]: {
           ...editFormData[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       });
     } else {
       setEditFormData({
@@ -77,7 +77,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
 
   const handleArrayInputChange = (e, field) => {
     const { value } = e.target;
-    const valuesArray = value.split(',').map(item => item.trim());
+    const valuesArray = value.split(",").map((item) => item.trim());
     setEditFormData({
       ...editFormData,
       [field]: valuesArray,
@@ -86,27 +86,27 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       // send updated profile to api
       const response = await fetch(`/api/users/${pageUserId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(editFormData),
       });
-      
+
       if (!response.ok) {
-        throw new Error('failed to update profile');
+        throw new Error("failed to update profile");
       }
-      
+
       // update the user state with the new data
       setUser(editFormData);
       setIsEditing(false);
     } catch (error) {
-      console.error('error updating profile:', error);
-      alert('failed to update profile. please try again.');
+      console.error("error updating profile:", error);
+      alert("failed to update profile. please try again.");
     }
   };
 
@@ -117,7 +117,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
   return (
     <div className="profile-page">
       {/* nav bar */}
-      <nav className="navbar">
+      {/* <nav className="navbar">
         <div className="logo">
           <Link href="/timeline">Ensemble</Link>
         </div>
@@ -127,7 +127,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
           <Link href="/profile">Profile</Link>
           <button className="logout-btn">Logout</button>
         </div>
-      </nav>
+      </nav> */}
 
       {/* profile content */}
       <div className="profile-content">
@@ -135,8 +135,14 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
         <div className="profile-header">
           <div className="profile-pic">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={user.profilePic} alt={`${user.name}'s profile`} />
-              <AvatarFallback>{user.name.charAt(0)}{user.name.split(' ')[1]?.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                src={user.profilePic}
+                alt={`${user.name}'s profile`}
+              />
+              <AvatarFallback>
+                {user.name.charAt(0)}
+                {user.name.split(" ")[1]?.charAt(0)}
+              </AvatarFallback>
             </Avatar>
           </div>
           <div className="profile-info">
@@ -163,18 +169,24 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
               <div className="genres">
                 <h2>Genres</h2>
                 <div className="tags">
-                  {user.genres && user.genres.map((genre, index) => (
-                    <span key={index} className="tag">{genre}</span>
-                  ))}
+                  {user.genres &&
+                    user.genres.map((genre, index) => (
+                      <span key={index} className="tag">
+                        {genre}
+                      </span>
+                    ))}
                 </div>
               </div>
 
               <div className="instruments">
                 <h2>Instruments</h2>
                 <div className="tags">
-                  {user.instruments && user.instruments.map((instrument, index) => (
-                    <span key={index} className="tag">{instrument}</span>
-                  ))}
+                  {user.instruments &&
+                    user.instruments.map((instrument, index) => (
+                      <span key={index} className="tag">
+                        {instrument}
+                      </span>
+                    ))}
                 </div>
               </div>
             </div>
@@ -183,9 +195,9 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
               <h2>Links</h2>
               <div className="link-buttons">
                 {user.links && user.links.soundcloud && (
-                  <a 
-                    href={user.links.soundcloud} 
-                    target="_blank" 
+                  <a
+                    href={user.links.soundcloud}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="music-link soundcloud"
                   >
@@ -193,9 +205,9 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                   </a>
                 )}
                 {user.links && user.links.bandcamp && (
-                  <a 
-                    href={user.links.bandcamp} 
-                    target="_blank" 
+                  <a
+                    href={user.links.bandcamp}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="music-link bandcamp"
                   >
@@ -203,9 +215,9 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                   </a>
                 )}
                 {user.links && user.links.instagram && (
-                  <a 
-                    href={user.links.instagram} 
-                    target="_blank" 
+                  <a
+                    href={user.links.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="music-link instagram"
                   >
@@ -224,7 +236,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="text"
                 id="name"
                 name="name"
-                value={editFormData.name || ''}
+                value={editFormData.name || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -234,7 +246,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
               <textarea
                 id="bio"
                 name="bio"
-                value={editFormData.bio || ''}
+                value={editFormData.bio || ""}
                 onChange={handleInputChange}
               ></textarea>
             </div>
@@ -245,7 +257,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="text"
                 id="location"
                 name="location"
-                value={editFormData.location || ''}
+                value={editFormData.location || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -256,8 +268,8 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="text"
                 id="genres"
                 name="genres"
-                value={(editFormData.genres || []).join(', ')}
-                onChange={(e) => handleArrayInputChange(e, 'genres')}
+                value={(editFormData.genres || []).join(", ")}
+                onChange={(e) => handleArrayInputChange(e, "genres")}
               />
             </div>
 
@@ -267,8 +279,8 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="text"
                 id="instruments"
                 name="instruments"
-                value={(editFormData.instruments || []).join(', ')}
-                onChange={(e) => handleArrayInputChange(e, 'instruments')}
+                value={(editFormData.instruments || []).join(", ")}
+                onChange={(e) => handleArrayInputChange(e, "instruments")}
               />
             </div>
 
@@ -278,7 +290,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="url"
                 id="soundcloud"
                 name="links.soundcloud"
-                value={editFormData.links?.soundcloud || ''}
+                value={editFormData.links?.soundcloud || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -289,7 +301,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="url"
                 id="bandcamp"
                 name="links.bandcamp"
-                value={editFormData.links?.bandcamp || ''}
+                value={editFormData.links?.bandcamp || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -300,14 +312,20 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
                 type="url"
                 id="instagram"
                 name="links.instagram"
-                value={editFormData.links?.instagram || ''}
+                value={editFormData.links?.instagram || ""}
                 onChange={handleInputChange}
               />
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="save-btn">Save Changes</button>
-              <button type="button" className="cancel-btn" onClick={handleEditToggle}>
+              <button type="submit" className="save-btn">
+                Save Changes
+              </button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={handleEditToggle}
+              >
                 Cancel
               </button>
             </div>
@@ -322,7 +340,9 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
               {user.posts.map((post) => (
                 <div key={post.id} className="post-card">
                   <h3>{post.title}</h3>
-                  <p className="post-date">{new Date(post.date).toLocaleDateString()}</p>
+                  <p className="post-date">
+                    {new Date(post.date).toLocaleDateString()}
+                  </p>
                   <p className="post-content">{post.content}</p>
                   <div className="post-stats">
                     <span>{post.likes} likes</span>
@@ -340,7 +360,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
           ) : (
             <p className="no-posts">no posts yet.</p>
           )}
-          
+
           {isOwnProfile && (
             <button className="new-post-btn">Create New Post</button>
           )}

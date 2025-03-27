@@ -5,16 +5,17 @@
 @layer components {
   .phoneBg {
     @apply bg-cover bg-center bg-no-repeat;
-  background-image: url("../images/vertical_grad_bg.png");
+  background-image: url("/images/vertical_grad_bg.png");
 }
 }
 
 @layer components {
   .bg {
     @apply bg-cover bg-center bg-no-repeat;
-   background-image: url("../images/grad_bg.png");
+   background-image: url("/images/grad_bg.png");
 }
 }
+
 
 @layer base {
   :root {
