@@ -13,8 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link"
-
+import Link from "next/link";
 
 export default async function Page() {
   const db = new pg.Pool({
@@ -28,28 +27,34 @@ export default async function Page() {
 
   //   Threads Buttons section
 
-  const threads = (await db.query(`SELECT * FROM threads`)).rows
+  const threads = (await db.query(`SELECT * FROM threads`)).rows;
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <section className="flex flex-row gap-2 md:gap-5 w-full max-w-4xl py-4 overflow-x-auto">
+    <div className="flex flex-col items-center w-screen">
+      <h1 className="text-3xl font-semibold mt-8 text-white font-lora italic">Timeline</h1>
+      <section className="flex flex-row justify-center gap-2 md:gap-5 w-[80vw] max-w-4xl py-4 overflow-x-auto">
         {threads.map((thread) => (
-          <Button key={thread.id} variant="outline" asChild><Link href={`/timeline/${thread.id}`}>{thread.type}</Link></Button>
-        ))}        
+          <Button key={thread.id} variant="outline" asChild>
+            <Link href={`/timeline/${thread.id}`}>{thread.type}</Link>
+          </Button>
+        ))}
       </section>
 
       {/* Posts section to display all posts */}
-      <section className="flex flex-col w-full max-w-4xl gap-4">
+
+      <section className="flex text-background flex-col w-full max-w-4xl gap-4">
+
         {allPosts.map((item) => (
           <PostItem key={item.id} item={item} user_id={item.user_id} />
         ))}
+
       </section>
 
       {/* NEW Post Section  */}
       <section>
-      <Button>
-        <Link href={'/new-post'}>Write a Post</Link>
-      </Button>
+        <Button>
+          <Link href={"/new-post"}>Write a Post</Link>
+        </Button>
       </section>
     </div>
   );
