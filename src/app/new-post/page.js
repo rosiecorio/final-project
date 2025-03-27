@@ -2,7 +2,7 @@ import NewPostForm from "@/components/NewPostForm";
 
 export default function NewPostPage() {
     return(
-        <div className="flex justify-center items-center min-h-screen bg-phoneBg">
+        <div className="flex justify-center items-center min-h-screen phoneBg">
             <NewPostForm />
         </div>
     )

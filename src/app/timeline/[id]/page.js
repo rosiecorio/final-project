@@ -53,9 +53,9 @@ export default async function Page({params}) {
       {/* NEW Post Section  */}
 
       <section className="py-4">
-        <NewPostButton>
-          <NewPostForm />
-        </NewPostButton>
+        <Button>
+        <Link href={'/new-post'}>Write a Post</Link>
+      </Button>
       </section>
     </div>
   );
