@@ -41,7 +41,9 @@ export default async function Page() {
       </section>
 
       {/* Posts section to display all posts */}
-      <section className="flex flex-col w-[85vw] max-w-4xl gap-4">
+
+      <section className="flex text-background flex-col w-full max-w-4xl gap-4">
+
         {allPosts.map((item) => (
           <PostItem key={item.id} item={item} user_id={item.user_id} />
         ))}
