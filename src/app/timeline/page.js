@@ -30,9 +30,9 @@ export default async function Page() {
   const threads = (await db.query(`SELECT * FROM threads`)).rows;
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <h1 className="text-3xl font-semibold mt-8 text-white">Timeline</h1>
-      <section className="flex flex-row justify-center gap-2 md:gap-5 w-full max-w-4xl py-4 overflow-x-auto">
+    <div className="flex flex-col items-center w-screen">
+      <h1 className="text-3xl font-semibold mt-8 text-white font-lora italic">Timeline</h1>
+      <section className="flex flex-row justify-center gap-2 md:gap-5 w-[80vw] max-w-4xl py-4 overflow-x-auto">
         {threads.map((thread) => (
           <Button key={thread.id} variant="outline" asChild>
             <Link href={`/timeline/${thread.id}`}>{thread.type}</Link>
@@ -41,7 +41,7 @@ export default async function Page() {
       </section>
 
       {/* Posts section to display all posts */}
-      <section className="flex flex-col w-full max-w-4xl gap-4">
+      <section className="flex flex-col w-[85vw] max-w-4xl gap-4">
         {allPosts.map((item) => (
           <PostItem key={item.id} item={item} user_id={item.user_id} />
         ))}
