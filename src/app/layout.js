@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${rye.variable} ${lora.variable} ${inter.variable} antialiased h-screen flex flex-col`}
         >
-          <header className="flex flex-row justify-between items-center">
+          <header className="flex flex-row justify-between items-center bg-background-dark w-screen">
             <Header />
             <div className="self-center justify-self-center mr-5 flex flex-row justify-between">
               <SignedOut>
