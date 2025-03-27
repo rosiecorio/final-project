@@ -3,8 +3,13 @@ import { auth } from '@clerk/nextjs/server';
 import pg from 'pg';
 
 export default async function ProfilePage({ params }) {
-  // Get userId from URL params and current authenticated user
-  const pageUserId = params.userId;
+  // First await the params object
+  const param = await params;
+  
+  // Then access the userId property
+  const pageUserId = await param.userId;
+  
+  // Get current authenticated user
   const { userId: clerkUserId } = await auth();
   
   // Create database connection
@@ -121,7 +126,6 @@ export default async function ProfilePage({ params }) {
       </div>
     );
   } finally {
-    // Close the database connection
     await db.end();
   }
 }
