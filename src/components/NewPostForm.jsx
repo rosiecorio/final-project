@@ -1,9 +1,10 @@
 import pg from "pg"
 import { revalidatePath } from "next/cache"
 import { auth } from "@clerk/nextjs/server"
+import { useRouter } from "next/router"
 
 export default async function NewPostForm() {
-    
+    const router = useRouter()
     async function handleSubmit(formData) {
 
         'use server'
@@ -23,24 +24,24 @@ export default async function NewPostForm() {
         const user_id = (await db.query(`SELECT id FROM users WHERE clerk_id = $1`, [userId])).rows[0].id
         
         await db.query(`INSERT INTO posts (user_id, thread_id, content) VALUES ($1, $2, $3)`, [user_id, threadNumber, content])
-        revalidatePath('/timeline')
+        router.push("/timeline")
     }
 
     return (
             <form action={handleSubmit} 
-            className="h-[87vh] w-[93vw] bg-[#292728] border border-black  rounded-xl p-6 text-[#f0dddf]">
+            className="h-[87vh] w-[93vw] bg-background-dark border border-black  rounded-xl p-6 text-text-pink">
                 <div className="flex flex-col gap-6">
                     <section className="flex flex-col">
-                        <label className="text-lg font-lora font-semibold text-center" htmlFor="content">
+                        <label className="text-lg font-lora font-bold text-text-light text-center" htmlFor="content">
                             Write a Post..
                         </label>
-                        <textarea className="h-[40vh] w-full rounded-md bg-[#F0DDDF] font-inter text-black p-3 border border-[#292728] focus:outline-none focus:ring-2 focus:ring-[#ed6044] mt-2" 
+                        <textarea className="h-[40vh] w-full rounded-md bg-background font-inter text-text-light p-3 border border-background focus:outline-none focus:ring-2 focus:ring-accent mt-2" 
                         id="content" 
                         name="content"></textarea>
                     </section>
                     {/*Radio Button*/}                
                     <section className="flex flex-col">
-                        <label className="text-lg font-semibold text-center underline mb-3 font-lora" htmlFor="thread_id">
+                        <label className="text-lg font-bold text-text-light text-center underline mb-3 font-lora" htmlFor="thread_id">
                             Category:
                         </label>       
                         <div className="grid grid-cols-2 gap-3 text-sm p-5 font-inter">
@@ -69,12 +70,12 @@ export default async function NewPostForm() {
                 </div>
                 <div className="flex justify-center">
                     <button 
-                className="mt-2 w-[15vh] bg-[#ed6044] font-lora italic text-white py-2 rounded-md font-semibold hover:bg-[#e6c2ac] hover:text-[#292728] transition duration-200" 
+                className="mt-2 w-[15vh] bg-accent font-lora italic text-white py-2 rounded-md font-semibold hover:bg-accent-soft hover:text-background-dark transition duration-200" 
                 type="submit">
                     Submit
                 </button> 
                 </div>                
                                
-            </form>
+            </form>    
     )
 }

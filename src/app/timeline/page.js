@@ -1,3 +1,4 @@
+'use client'
 import DeletePost from "@/components/DeletePost";
 import NewPostButton from "@/components/NewPostButton";
 import NewPostForm from "@/components/NewPostForm";
@@ -13,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 import Link from "next/link"
 
 export default async function Page() {
@@ -25,6 +27,7 @@ export default async function Page() {
       JOIN users ON posts.user_id = users.id`)
   ).rows;
 
+  const router = useRouter()
   //   Threads Buttons section
 
   const threads = (await db.query(`SELECT * FROM threads`)).rows
@@ -47,9 +50,10 @@ export default async function Page() {
       {/* NEW Post Section  */}
 
       <section className="py-4">
-        <NewPostButton>
-          <NewPostForm />
-        </NewPostButton>
+       <Button 
+       onClick={() => router.push("/new-post")}>
+        Write a Post
+       </Button>
       </section>
     </div>
   );

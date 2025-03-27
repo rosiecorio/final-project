@@ -23,7 +23,10 @@ export default {
 			]
 		},
   		colors: {
-  			background: 'hsl(var(--background))',
+  			background: {
+				DEFAULT: "#292929",
+				dark: "#080808",
+			},
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -46,13 +49,18 @@ export default {
   				foreground: 'hsl(var(--muted-foreground))'
   			},
   			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
+  				DEFAULT: '#ed6044',
+  				soft: '#ff99a7',
   			},
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			text: {
+				light: "#fff2ec",
+				pink: "#f0dddf",
+				sand: "#e6c2ac",
+			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
