@@ -119,7 +119,7 @@ export default async function ProfilePage({ params }) {
     return (
       <div className="container mx-auto py-12 text-center">
         <h1 className="text-2xl font-bold">Something went wrong</h1>
-        <p className="mt-4">We couldn't load this profile. Please try again later.</p>
+        <p className="mt-4">We couldnt load this profile. Please try again later.</p>
       </div>
     );
   } finally {
