@@ -45,6 +45,7 @@ export default async function Page() {
         {allPosts.map((item) => (
           <PostItem key={item.id} item={item} user_id={item.user_id} />
         ))}
+
       </section>
 
       {/* NEW Post Section  */}

@@ -10,7 +10,7 @@ import {
 
 export default function Header() {
   return (
-    <nav className="flex justify-between p-4">
+    <nav className="bg-background-dark flex justify-between p-4">
       <Link href="/timeline" className="text-2xl font-bold text-orange-600">
         Ensemble
       </Link>
