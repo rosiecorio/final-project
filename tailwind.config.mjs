@@ -8,6 +8,20 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			'rye': [
+				'var(--font-rye)',
+				'serif'
+			],
+			'lora': [
+				'var(--font-lora)',
+				'serif'
+			],
+			'inter':[
+				'var(--font-inter)',
+				'sans-serif'
+			]
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
