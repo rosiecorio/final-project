@@ -2,7 +2,6 @@
 import pg from "pg"
 import { revalidatePath } from "next/cache"
 import { auth } from "@clerk/nextjs/server"
-// import { useRouter } from "next/navigation"
 
 export default async function NewPostForm() {
     async function handleSubmit(formData) {
@@ -24,7 +23,7 @@ export default async function NewPostForm() {
         const user_id = (await db.query(`SELECT id FROM users WHERE clerk_id = $1`, [userId])).rows[0].id
         
         await db.query(`INSERT INTO posts (user_id, thread_id, content) VALUES ($1, $2, $3)`, [user_id, threadNumber, content])
-        revalidatePath("/timeline")
+        revalidatePath('/timeline')
     }
 
     return (
