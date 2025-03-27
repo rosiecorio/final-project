@@ -3,13 +3,14 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import pg from 'pg';
 
+// This is the profile page for the currently logged-in user
 export default async function ProfilePage() {
-  // Get current authenticated user
-  const { userId: clerkUserId } = await auth();
+  // Get current logged-in user's ID
+  const { userId } = await auth();
   
   // If not logged in, redirect to sign-in
-  if (!clerkUserId) {
-    redirect('/sign-in');
+  if (!userId) {
+    return redirect('/sign-in');
   }
   
   // Create database connection
@@ -18,7 +19,31 @@ export default async function ProfilePage() {
   });
   
   try {
-    // Fetch user data with instruments and genres
+    // Check if user exists in database
+    const userExistsQuery = await db.query(
+      'SELECT id FROM users WHERE clerk_id = $1 LIMIT 1',
+      [userId]
+    );
+    
+    // If user hasn't set up their profile, show link to userInfo page
+    if (userExistsQuery.rowCount === 0) {
+      return (
+        <div className="container mx-auto py-12 text-center">
+          <h1 className="text-2xl font-bold">Profile not set up</h1>
+          <p className="mt-4">You need to set up your profile first.</p>
+          <a 
+            href="/userInfo" 
+            className="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Set up profile
+          </a>
+        </div>
+      );
+    }
+    
+    const databaseUserId = userExistsQuery.rows[0].id;
+    
+    // Now fetch complete user data
     const userResult = await db.query(
       `SELECT 
         u.*,
@@ -33,18 +58,10 @@ export default async function ProfilePage() {
       LEFT JOIN instrument i ON u.id = i.user_id
       LEFT JOIN genres g ON i.genre = g.id::text
       WHERE u.clerk_id = $1`,
-      [clerkUserId]
+      [userId]
     );
     
-    // If user hasn't set up their profile yet, redirect to the form
-    if (userResult.rows.length === 0) {
-      redirect('/userinfo');
-    }
-    
-    // Get user ID from the database for fetching posts
-    const databaseUserId = userResult.rows[0].id;
-    
-    // Fetch user posts with comment counts
+    // Fetch user posts
     const postsResult = await db.query(
       `SELECT 
         p.*,
@@ -122,7 +139,6 @@ export default async function ProfilePage() {
       </div>
     );
   } finally {
-    // Close the database connection
     await db.end();
   }
 }
