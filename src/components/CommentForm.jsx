@@ -31,7 +31,7 @@ export default function CommentForm({ postId }) {
 
       await db.query(
         `INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)`,
-        [postId, userId, content]
+        [postId, user_id, content]
       );
       revalidatePath("/timeline");
     } catch (error) {
