@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link"
-import WritePostButton from "@/components/WritePostButton";
+
 
 export default async function Page() {
   const db = new pg.Pool({
@@ -47,7 +47,9 @@ export default async function Page() {
 
       {/* NEW Post Section  */}
       <section>
-      <WritePostButton />
+      <Button>
+        <Link href={'/new-post'}>Write a Post</Link>
+      </Button>
       </section>
     </div>
   );
