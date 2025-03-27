@@ -2,12 +2,13 @@ import { ProfileClient } from '@/components/ProfileClient';
 import { auth } from '@clerk/nextjs/server';
 import pg from 'pg';
 
-export default async function ProfilePage({ params }) {
-  // Correctly extract userId from params
+// This page handles viewing other users' profiles by ID
+export default async function ProfileIdPage({ params }) {
+  // Get the ID from URL params
   const { userId } = await params;
   
-  // Get current authenticated user
-  const { userId: clerkUserId } = await auth();
+  // Get current logged-in user's ID (if any) for comparison
+  const { userId: currentUserId } = await auth();
   
   // Create database connection
   const db = new pg.Pool({
@@ -29,10 +30,11 @@ export default async function ProfilePage({ params }) {
       FROM users u
       LEFT JOIN instrument i ON u.id = i.user_id
       LEFT JOIN genres g ON i.genre = g.id::text
-      WHERE u.clerk_id = $1`,
+      WHERE u.id = $1`,
       [userId]
     );
     
+    // User not found
     if (userResult.rows.length === 0) {
       return (
         <div className="container mx-auto py-12 text-center">
@@ -42,10 +44,10 @@ export default async function ProfilePage({ params }) {
       );
     }
     
-    // Get user ID from the database for fetching posts
+    // Get user ID from database
     const databaseUserId = userResult.rows[0].id;
     
-    // Fetch user posts with comment counts
+    // Fetch user posts
     const postsResult = await db.query(
       `SELECT 
         p.*,
@@ -85,6 +87,9 @@ export default async function ProfilePage({ params }) {
       }
     });
     
+    // Check if this is the current user's own profile
+    const isOwnProfile = userData.clerk_id === currentUserId;
+    
     // Format user data for the client component
     const formattedUser = {
       id: userData.id,
@@ -102,7 +107,7 @@ export default async function ProfilePage({ params }) {
         bandcamp: userData.bandcamp_url || '',
         instagram: userData.instagram_url || ''
       },
-      isOwnProfile: clerkUserId === userId,
+      isOwnProfile: isOwnProfile,
       posts: postsResult.rows.map(post => ({
         id: post.id,
         title: post.title || `Post #${post.id}`,
@@ -123,7 +128,6 @@ export default async function ProfilePage({ params }) {
       </div>
     );
   } finally {
-    // Close the database connection
     await db.end();
   }
 }
