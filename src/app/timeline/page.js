@@ -21,7 +21,7 @@ export default async function Page() {
   });
 
   const allPosts = (
-    await db.query(`SELECT posts.*,  users.username, users.id AS user_id FROM posts 
+    await db.query(`SELECT posts.*,  users.username, users.clerk_id, users.id AS user_id FROM posts 
       JOIN users ON posts.user_id = users.id`)
   ).rows;
 
@@ -82,7 +82,7 @@ async function PostItem({ item }) {
           </AvatarFallback>
         </Avatar>
         <div className="space-y-1">
-          <h4 className="text-sm font-semibold">{item.username}</h4>
+          <Link href={`/profile/${item.clerk_id}`}><h4 className="text-sm font-semibold">{item.username}</h4></Link>
           <p className="text-sm text-gray-500">Date Posted</p>
         </div>
       </CardHeader>
