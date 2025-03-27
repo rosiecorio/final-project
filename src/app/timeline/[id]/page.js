@@ -15,15 +15,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link"
 
-
-export default async function Page() {
+export default async function Page({params}) {
   const db = new pg.Pool({
     connectionString: process.env.DB_CONN,
   });
 
+  const {id} = await params
+
+  // const allPosts = (
+  //   await db.query(`SELECT * FROM posts WHERE thread_id = $1`, [id])
+  // ).rows;
+
   const allPosts = (
-    await db.query(`SELECT posts.*,  users.username, users.id AS user_id FROM posts 
-      JOIN users ON posts.user_id = users.id`)
+    await db.query(`SELECT posts.*,  users.username, users.id AS user_id FROM posts
+      JOIN users ON posts.user_id = users.id WHERE thread_id = $1`, [id])
   ).rows;
 
   //   Threads Buttons section
@@ -35,7 +40,7 @@ export default async function Page() {
       <section className="flex flex-row gap-2 md:gap-5 w-full max-w-4xl py-4 overflow-x-auto">
         {threads.map((thread) => (
           <Button key={thread.id} variant="outline" asChild><Link href={`/timeline/${thread.id}`}>{thread.type}</Link></Button>
-        ))}        
+        ))} 
       </section>
 
       {/* Posts section to display all posts */}
@@ -46,10 +51,11 @@ export default async function Page() {
       </section>
 
       {/* NEW Post Section  */}
-      <section>
-      <Button>
-        <Link href={'/new-post'}>Write a Post</Link>
-      </Button>
+
+      <section className="py-4">
+        <NewPostButton>
+          <NewPostForm />
+        </NewPostButton>
       </section>
     </div>
   );
