@@ -13,11 +13,11 @@ export default function ReviewsSection() {
   return (
     <section className="py-12 bg-dark">
       <div className="container mx-auto px-4 flex flex-col items-center">
-        <h2 className="text-3xl font-semibold text-white mb-8 text-center">
+        <h2 className="text-3xl font-lora font-semibold text-white mb-8 text-center">
           What Musicians are saying...
         </h2>
       </div>
-      <div className="container mx-auto px-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="container font-inter mx-auto px-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>Incredible Platform!</CardTitle>
