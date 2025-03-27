@@ -3,8 +3,10 @@ import { auth } from '@clerk/nextjs/server';
 import pg from 'pg';
 
 export default async function ProfilePage({ params }) {
-  // Get userId from URL params and current authenticated user
-  const pageUserId = params.userId;
+  // Correctly extract userId from params
+  const { userId } = await params;
+  
+  // Get current authenticated user
   const { userId: clerkUserId } = await auth();
   
   // Create database connection
@@ -28,7 +30,7 @@ export default async function ProfilePage({ params }) {
       LEFT JOIN instrument i ON u.id = i.user_id
       LEFT JOIN genres g ON i.genre = g.id::text
       WHERE u.clerk_id = $1`,
-      [pageUserId]
+      [userId]
     );
     
     if (userResult.rows.length === 0) {
@@ -100,7 +102,7 @@ export default async function ProfilePage({ params }) {
         bandcamp: userData.bandcamp_url || '',
         instagram: userData.instagram_url || ''
       },
-      isOwnProfile: clerkUserId === pageUserId,
+      isOwnProfile: clerkUserId === userId,
       posts: postsResult.rows.map(post => ({
         id: post.id,
         title: post.title || `Post #${post.id}`,
