@@ -11,7 +11,7 @@ import {
 
 export default function Header() {
   return (
-    <nav className="bg-background-dark w-[110vh] flex justify-between p-2">
+    <nav className="flex justify-between p-2">
       <Link href="/timeline" className="text-2xl font-bold text-orange-600">
        <Image src="/images/logo1.png"
        alt="brand logo"
