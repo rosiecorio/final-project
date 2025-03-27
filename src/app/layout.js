@@ -21,6 +21,7 @@ const lora = Lora({
   variable: "--font-lora",
   subsets: ["latin"],
   style: ["italic", "normal"],
+  weight: ['400', '500', '600', '700'],
 });
 
 const inter = Inter({
