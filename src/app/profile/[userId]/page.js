@@ -39,7 +39,7 @@ export default async function ProfileIdPage({ params }) {
       return (
         <div className="container mx-auto py-12 text-center">
           <h1 className="text-2xl font-bold">User not found</h1>
-          <p className="mt-4">The user profile you're looking for doesn't exist.</p>
+          <p className="mt-4">The user profile youre looking for doesnt exist.</p>
         </div>
       );
     }
@@ -124,7 +124,7 @@ export default async function ProfileIdPage({ params }) {
     return (
       <div className="container mx-auto py-12 text-center">
         <h1 className="text-2xl font-bold">Something went wrong</h1>
-        <p className="mt-4">We couldn't load this profile. Please try again later.</p>
+        <p className="mt-4">We couldnt load this profile. Please try again later.</p>
       </div>
     );
   } finally {
