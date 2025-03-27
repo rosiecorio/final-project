@@ -1,4 +1,4 @@
-import { ProfileClient } from '@/components/ProfileClient';
+import ProfileClient from '@/components/ProfileClient';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import pg from 'pg';
@@ -63,15 +63,14 @@ export default async function ProfilePage() {
     
     // Fetch user posts
     const postsResult = await db.query(
-      `SELECT 
+      `SELECT
         p.*,
-        COUNT(c.id) as comments,
-        MAX(p.created_at) as post_date
+        COUNT(c.id) as comments
       FROM posts p
       LEFT JOIN comments c ON p.id = c.post_id
       WHERE p.user_id = $1
       GROUP BY p.id
-      ORDER BY p.created_at DESC`,
+      ORDER BY p.id DESC`,  // Ordering by ID instead of timestamp
       [databaseUserId]
     );
     

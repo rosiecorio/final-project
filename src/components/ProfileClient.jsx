@@ -119,7 +119,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
       {/* nav bar */}
       <nav className="navbar">
         <div className="logo">
-          <Link href="/timeline">MusicConnect</Link>
+          <Link href="/timeline">Ensemble</Link>
         </div>
         <div className="nav-links">
           <Link href="/timeline">Timeline</Link>
