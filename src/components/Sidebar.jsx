@@ -15,7 +15,7 @@ export default function Sidebar({ className }) {
   return (
     <div
       className={cn(
-        "h-screen bg-white text-black flex flex-col",
+        "h-screen bg-dark text-white flex flex-col",
         className,
         collapsed ? "w-16" : "w-64"
       )}
@@ -29,7 +29,7 @@ export default function Sidebar({ className }) {
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
         >
-          <Menu className="h-6 w-6 text-black" />
+          <Menu className="h-6 w-6 text-white" />
         </Button>
       </div>
 

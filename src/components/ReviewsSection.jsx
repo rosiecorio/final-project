@@ -11,9 +11,9 @@ import {
 
 export default function ReviewsSection() {
   return (
-    <section className="py-12 bg-gray-100">
+    <section className="py-12 bg-dark">
       <div className="container mx-auto px-4 flex flex-col items-center">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
+        <h2 className="text-3xl font-semibold text-white mb-8 text-center">
           What Musicians are saying...
         </h2>
       </div>
@@ -22,6 +22,7 @@ export default function ReviewsSection() {
           <CardHeader>
             <CardTitle>Incredible Platform!</CardTitle>
             <CardDescription>John Doe, Guitarist</CardDescription>
+            ⭐⭐⭐⭐⭐
           </CardHeader>
           <CardContent>
             "LocalChord has completely transformed how I connect with other
@@ -32,6 +33,7 @@ export default function ReviewsSection() {
           <CardHeader>
             <CardTitle>Game Changer!</CardTitle>
             <CardDescription>Jane Smith, Vocalist</CardDescription>
+            ⭐⭐⭐⭐⭐
           </CardHeader>
           <CardContent>
             "Finding gigs and collaborators has never been easier. LocalChord is
@@ -42,6 +44,7 @@ export default function ReviewsSection() {
           <CardHeader>
             <CardTitle>Best Music App Ever!</CardTitle>
             <CardDescription>Mike Johnson, Drummer</CardDescription>
+            ⭐⭐⭐⭐⭐
           </CardHeader>
           <CardContent>
             "I've tried other platforms, but LocalChord is by far the best for
