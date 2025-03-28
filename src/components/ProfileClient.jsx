@@ -487,7 +487,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
   return (
     <div className="profile-page">
       {/* nav bar */}
-      <nav className="navbar">
+      {/* <nav className="navbar">
         <div className="logo">
           <Link href="/timeline">Ensemble</Link>
         </div>
@@ -497,7 +497,7 @@ const ProfileClient = ({ initialUser, initialPosts }) => {
           <Link href="/profile">Profile</Link>
           <button className="logout-btn">Logout</button>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Status Message or Error Display */}
       {(statusMessage || error) && (
